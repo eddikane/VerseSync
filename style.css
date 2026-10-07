@@ -72,8 +72,11 @@ input, textarea {
     border-radius: 5px;
     padding: 10px;
     box-sizing: border-box;
-    width: 100%;
-     
+    width: 100%;  
+}
+
+input:focus, textarea:focus {
+    border-color: #B79A5B;
 }
 
 textarea {
@@ -91,4 +94,27 @@ button {
 
 button:hover {
     background-color: brown;
+}
+
+.insight-card {
+    border: 2px solid #D8CBB8;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #F7F3EC;
+    text-align: left;
+}
+
+.author-name {
+    font-weight: bold;
+}
+
+.scripture-reference {
+    font-style: italic;
+    color: #96783D
+}
+
+.insight-text {
+    font-size: 16px;
+    line-height: 1.6;
 }
