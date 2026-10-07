@@ -1,0 +1,94 @@
+header {
+    text-align: center;
+    background-color: #5B4A3A;
+    color: #FFF9F0;
+    padding: 1.0px;
+    margin: 50px; 
+    border-radius: 10px;
+}
+
+h1 {
+    font-size: 42px;
+}
+
+h1, h2 {
+    font-family: "Playfair Display", serif;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 32px;
+}
+
+main {
+    font-family: "Google Sans", sans-serif;
+    color: #2F2A26;
+    background-color: #F7F3EC;
+    font-size: 16px;
+    line-height: 1.0;
+    margin: 0px;
+    text-align: center;
+}
+
+nav {
+    text-align: center;
+    padding: 2px;
+}
+
+section {
+    padding: 20px;
+    margin-bottom: 25px;
+    background-color: #FFFDFC;
+    border: 5px solid #d8cbb8;
+    border-radius: 10px;
+}
+
+#this-week {
+    border-color: #B79A5B;
+    text-align: center;
+    background-color: #FFF9F0;
+}
+
+#share-insight {
+    border-color: #B79A5B;
+    background-color: #FFFFFF;
+}
+
+#insights {
+    border-color: #B79A5B;
+    background-color: #FFFFFF;
+}
+
+label {
+    display: block;
+    margin-bottom: 2px;
+    margin-top: 20px;
+    text-align: left;
+}
+
+input, textarea {
+    font-size: 16px;
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+     
+}
+
+textarea {
+    height: 100px;
+}
+
+button {
+    background-color:#B79A5B;
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background-color 0.4s ease;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: brown;
+}
