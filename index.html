@@ -12,24 +12,30 @@
 </head>
 
 <header>
-    <h1>VerseSync</h1>
+    <h1>Versesync</h1>
 </header>
 
 <main>
     <section id="this-week">
-       <h2>This Week</h2>
-       <p>Read Alma 32-34</p>
+       <h2 id="week-title">This Week</h2>
+       <p id="week-reading"></p>
+
+        <!-- Opens the current week's scripture reading in Gospel Library -->
+        <a id="scripture-link" href="#" target="_blank">
+            Come, Follow Me
+        </a>
+
 
        <nav>
-            <button type="button">Previous Week</button>
-            <button type="button">Next Week</button>
+            <button type="button" id="previous-week">Previous Week</button>
+            <button type="button" id="next-week">Next Week</button>
        </nav>
     </section>
 
     <section id="share-insight">
         <h2>Share An Insight</h2>
 
-        <form>
+        <form id="insight-form">
             <label for="name">Name</label>
             <input id="name" type="text">
 
@@ -46,12 +52,7 @@
     <section id="insights">
         <h2>Insights</h2>
 
-        <div class="insight-card">
-            <p class="author-name">Edward</p>
-            <p class="scripture-reference">Alma 32:21</p>
-            <p class="insight-text">This verse helped me think about faith differently.</p>
-        </div>
-
+        <div id="insights-list"></div>
     </section>
     <script src="script.js"></script>
 </main>
