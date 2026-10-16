@@ -1,137 +1,365 @@
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+/*
+Styles the main VerseSync title area.
+
+The dark warm brown and cream text establish
+the main color theme used throughout the site.
+*/
 header {
     text-align: center;
     background-color: #5B4A3A;
     color: #FFF9F0;
-    padding: 1.0px;
-    margin: 50px; 
+
+    padding: 1px;
+    margin: 50px;
+
     border-radius: 10px;
 }
 
+
+/* Main VerseSync title */
 h1 {
     font-size: 42px;
 }
 
-h1, h2 {
+
+/*
+Uses Playfair Display for the main headings
+to give VerseSync a more traditional/scripture-study feel.
+*/
+h1,
+h2 {
     font-family: "Playfair Display", serif;
     font-weight: bold;
 }
 
+
+/* Section heading size */
 h2 {
-    font-size: 32px;
+    font-size: 42px;
 }
 
+
+
+/* =========================================================
+   MAIN PAGE
+   ========================================================= */
+
+/*
+Sets the main font, colors, spacing, and alignment
+for the primary content area.
+*/
 main {
     font-family: "Google Sans", sans-serif;
+
     color: #2F2A26;
     background-color: #F7F3EC;
+
     font-size: 16px;
-    line-height: 1.0;
-    margin: 0px;
+    line-height: 1;
+
+    margin: 0;
+
     text-align: center;
 }
 
+
+
+/* =========================================================
+   WEEK NAVIGATION
+   ========================================================= */
+
+/*
+Centers the Previous Week and Next Week buttons
+and gives the navigation area a little spacing.
+*/
 nav {
     text-align: center;
     padding: 2px;
 }
 
+
+
+/* =========================================================
+   GENERAL SECTION STYLING
+   ========================================================= */
+
+/*
+Applies the same basic card-like appearance
+to each major section of the page.
+*/
 section {
     padding: 20px;
+
     margin-bottom: 25px;
+
     background-color: #FFFDFC;
-    border: 5px solid #d8cbb8;
+
+    border: 5px solid #D8CBB8;
     border-radius: 10px;
 }
 
+
+
+/* =========================================================
+   THIS WEEK SECTION
+   ========================================================= */
+
+/*
+Highlights the current week's reading using
+the site's muted gold accent color.
+*/
 #this-week {
     border-color: #B79A5B;
+
     text-align: center;
+
     background-color: #FFF9F0;
 }
+
+
+
+/* =========================================================
+   SHARE INSIGHT SECTION
+   ========================================================= */
 
 #share-insight {
     border-color: #B79A5B;
     background-color: #FFFFFF;
 }
 
+
+
+/* =========================================================
+   INSIGHTS SECTION
+   ========================================================= */
+
 #insights {
     border-color: #B79A5B;
     background-color: #FFFFFF;
 }
 
+
+
+/* =========================================================
+   FORM LABELS
+   ========================================================= */
+
+/*
+display: block makes each label take its own line,
+placing it above its corresponding input field.
+*/
 label {
     display: block;
+
     margin-bottom: 2px;
     margin-top: 20px;
+
     text-align: left;
 }
 
-input, textarea {
+
+
+/* =========================================================
+   FORM INPUTS
+   ========================================================= */
+
+/*
+Applies consistent styling to both normal text inputs
+and textarea fields throughout the site.
+
+box-sizing: border-box keeps the total width at 100%
+even after padding and borders are added.
+*/
+input,
+textarea {
     font-size: 16px;
+
     border: 2px solid black;
     border-radius: 5px;
+
     padding: 10px;
+
     box-sizing: border-box;
-    width: 100%;  
+
+    width: 100%;
 }
 
-input:focus, textarea:focus {
+
+/*
+Changes the border color when the user clicks
+or tabs into an input field.
+*/
+input:focus,
+textarea:focus {
     border-color: #B79A5B;
 }
 
+
+/*
+Provides more vertical space for longer insight
+and reply messages.
+*/
 textarea {
     height: 100px;
 }
 
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+/*
+Applies the same basic style to all buttons.
+
+The transition makes the hover color change
+appear smoothly instead of instantly.
+*/
 button {
-    background-color:#B79A5B;
+    background-color: #B79A5B;
     color: white;
+
     padding: 8px;
+
     border-radius: 8px;
+
     transition: background-color 0.4s ease;
+
+    /* Shows a hand cursor so users know the element is clickable */
     cursor: pointer;
 }
 
+
+/* Changes button color when the mouse hovers over it */
 button:hover {
     background-color: brown;
 }
 
+
+
+/* =========================================================
+   INDIVIDUAL INSIGHT CARDS
+   ========================================================= */
+
+/*
+Styles each insight generated dynamically by JavaScript.
+
+These cards do not exist permanently in index.html.
+script.js creates them and adds the "insight-card" class.
+*/
 .insight-card {
     border: 2px solid #D8CBB8;
+
     border-radius: 10px;
+
     padding: 15px;
+
     margin-bottom: 15px;
+
     background-color: #F7F3EC;
+
     text-align: left;
 }
 
+
+
+/* =========================================================
+   INSIGHT AUTHOR
+   ========================================================= */
+
+/* Makes the person who shared the insight easy to identify */
 .author-name {
     font-weight: bold;
 }
 
+
+
+/* =========================================================
+   SCRIPTURE REFERENCE
+   ========================================================= */
+
+/*
+Makes scripture references stand out from the
+main insight text using bold text and muted gold.
+*/
 .scripture-reference {
     font-weight: bold;
-    color: #96783D
+    color: #96783D;
 }
 
+
+
+/* =========================================================
+   INSIGHT MESSAGE
+   ========================================================= */
+
+/*
+Makes the actual insight slightly larger and italicized
+so it feels separate from the author's name and reference.
+*/
 .insight-text {
     font-style: italic;
+
     font-size: 20px;
+
     line-height: 1.2;
 }
 
+
+
+/* =========================================================
+   REPLIES
+   ========================================================= */
+
+/*
+Indents replies so they visually appear underneath
+and connected to the main insight.
+*/
 .replies-list {
-    margin-left:20px;
-    color: #5B4A3A;
+    margin-left: 20px;
     margin-top: 10px;
+
+    color: #5B4A3A;
 }
 
+
+/*
+Makes the reply author's name stand out
+from the message underneath it.
+*/
 .reply-author {
     font-weight: bold;
     font-size: 14px;
 }
 
+
+/*
+Styles reply messages slightly differently from
+the main insight so the hierarchy stays clear.
+*/
 .reply-text {
     font-size: 16px;
     font-style: italic;
+}
+
+
+
+/* =========================================================
+   SCRIPTURE / COME, FOLLOW ME LINK
+   ========================================================= */
+
+/*
+Styles the link that opens the current week's
+Come, Follow Me reading.
+
+The # symbol is used because scripture-link
+is an ID in the HTML.
+*/
+#scripture-link {
+    color: #5B4A3A;
+    text-align: left;
 }
