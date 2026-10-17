@@ -69,7 +69,6 @@ if (savedInsights) {
 
 /*
 Tracks which study week the user is currently viewing.
-
 The visible week numbers start at 1, while array indexes start at 0.
 That is why studyWeeks[currentWeek - 1] is used throughout the file.
 */
@@ -83,7 +82,6 @@ let currentWeek = 1;
 
 /*
 These variables connect JavaScript to specific HTML elements.
-
 document.querySelector() finds an element in the page so JavaScript
 can read from it, change it, or listen for user actions.
 */
@@ -399,10 +397,7 @@ function displayInsights() {
             Replies are nested inside their parent insight objects,
             so saving insights also saves all replies.
             */
-            localStorage.setItem(
-                "insights",
-                JSON.stringify(insights)
-            );
+            localStorage.setItem("insights", JSON.stringify(insights));
 
 
             /*
@@ -597,10 +592,7 @@ insightForm.addEventListener("submit", function(event) {
     JSON.stringify() converts the JavaScript array into a string
     because localStorage stores text values.
     */
-    localStorage.setItem(
-        "insights",
-        JSON.stringify(insights)
-    );
+    localStorage.setItem("insights", JSON.stringify(insights));
 
 
     /*

@@ -1,11 +1,10 @@
 # Overview
-
 I created a JavaScript-based scripture study website called VerseSync that allows users to move through weekly scripture study schedules, open the corresponding Come, Follow Me reading, share scripture insights, and reply to insights from others as well.
 I did this to improve my understanding of JavaScript by building a project that uses the language in a practical and interactive way. My goal was to strengthen my skills with basic JavaScript syntax, array methods, and browser localStorage while also creating a real life solution to one of the issues I would like a resolution to which is having a site to have interactive scriptrue study with my friends and family.
 
 One of the main things I wanted to accomplish was learning how JavaScript can control and update a webpage based on user actions. The weekly study information is stored in an array of objects, and JavaScript dynamically updates the date, scripture reading, and link when the user moves between weeks. Insights and replies are also created dynamically and saved using localStorage so they remain available after the page is refreshed.
 
-[Software Demo Video](http://youtube.link.goes.here)
+[Software Demo Video](https://youtu.be/QJbVIgjCAik)
 
 # Development Environment
 I developed VerseSync with Visual Studio Code as my code editor.
