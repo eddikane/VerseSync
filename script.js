@@ -1,3 +1,34 @@
+// Imports the Firebase functions needed to connect VerseSync to Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+
+// Imports Firestore tools for connecting, creating documents, and reading documents
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    doc,
+    updateDoc,
+    deleteDoc
+} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+// Identifies the Firebase project that VerseSync should connect to
+const firebaseConfig = {
+    apiKey: "AIzaSyA5afYG6rzXLbWuhKaXZzD81l6dgyupQKQ",
+    authDomain: "versesync-4fdbd.firebaseapp.com",
+    projectId: "versesync-4fdbd",
+    storageBucket: "versesync-4fdbd.firebasestorage.app",
+    messagingSenderId: "112642198904",
+    appId: "1:112642198904:web:b9854a2cd291232f808c8d"
+  };
+
+// Initializes Firebase using the VerseSync project configuration
+const app = initializeApp(firebaseConfig);
+
+// Creates a reference to the Firestore database connected to this app
+const db = getFirestore(app);
+
+
 /* =========================================================
    DATA
    ========================================================= */
@@ -54,16 +85,18 @@ with previously saved data from localStorage when the page loads.
 let insights = [];
 
 
-// Retrieves previously saved insights from the browser.
-const savedInsights = localStorage.getItem("insights");
+// Loads all saved insights from Firestore into the local insights array
+async function loadInsights() {
+    const querySnapshot = await getDocs(collection(db, "insights"));
 
+    // resets the existing array back to empty before loading fresh data from Firestore.
+    insights = [];
 
-/*
-If saved data exists, JSON.parse() converts the stored string
-back into a normal JavaScript array and replaces the empty array.
-*/
-if (savedInsights) {
-    insights = JSON.parse(savedInsights);
+    querySnapshot.forEach(function(document) {
+        insights.push({id: document.id, ...document.data()});
+    });
+
+    displayInsights();
 }
 
 
@@ -232,6 +265,42 @@ function displayInsights() {
         // Displays the text stored in the current insight object.
         insightText.textContent = insight.text;
 
+        // Creates a button that will let the user edit this insight
+        const editButton = document.createElement("button");
+
+        editButton.type = "button";
+        editButton.textContent = "Edit";
+
+        editButton.addEventListener("click", async function() {
+            const updatedText = prompt("Edit your insight:", insight.text);
+
+            if (!updatedText || !updatedText.trim()) {
+                return;
+            }
+            await updateDoc(doc(db, "insights", insight.id), {
+                text: updatedText
+            });
+
+            await loadInsights();
+        });
+
+        // Creates a button that lets the user delete this insight
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.textContent = "Delete";
+
+        deleteButton.addEventListener("click", async function() {
+            const confirmed = confirm("Are you sure you want to delete this insight?");
+
+            if (!confirmed) {
+                return;
+            }
+
+            await deleteDoc(doc(db, "insights", insight.id));
+
+            await loadInsights();
+        });
+    
 
         /* =====================================================
            REPLIES
@@ -404,7 +473,7 @@ function displayInsights() {
             Rebuilds the insight cards immediately so the newly
             submitted reply appears without refreshing the page.
             */
-            displayInsights();
+            displayInsights();  
         });
 
 
@@ -420,7 +489,9 @@ function displayInsights() {
             authorName,
             scriptureReference,
             insightText,
-            repliesList
+            repliesList,
+            editButton,
+            deleteButton
         );
 
 
@@ -452,10 +523,10 @@ updateWeekDisplay();
 
 
 /*
-Displays any insights loaded from localStorage for the
+Displays any insights loaded from Firestore for the
 currently selected week when the page first opens.
 */
-displayInsights();
+loadInsights();
 
 
 
@@ -530,7 +601,7 @@ previousWeekButton.addEventListener("click", function() {
 /*
 Runs whenever the user submits a new insight.
 */
-insightForm.addEventListener("submit", function(event) {
+insightForm.addEventListener("submit", async function(event) {
 
     /*
     Stops the browser's normal form behavior,
@@ -580,27 +651,11 @@ insightForm.addEventListener("submit", function(event) {
     };
 
 
-    /*
-    Adds the newly created insight object to the main insights array.
-    */
-    insights.push(newInsight);
+    // Saves the new insight to Firestore so it can be shared across devices
+    await addDoc(collection(db, "insights"), newInsight);
 
-
-    /*
-    Saves the updated insights array to the browser.
-
-    JSON.stringify() converts the JavaScript array into a string
-    because localStorage stores text values.
-    */
-    localStorage.setItem("insights", JSON.stringify(insights));
-
-
-    /*
-    Rebuilds the visible insight list immediately so the
-    newly submitted post appears without refreshing the page.
-    */
-    displayInsights();
-
+    // Reloads the latest Firestore data so the new insight appears immediately
+    await loadInsights();
 
     /*
     Clears all three form fields after a successful submission
