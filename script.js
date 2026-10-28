@@ -1,7 +1,7 @@
-// Imports the Firebase functions needed to connect VerseSync to Firebase
+// Imports the Firebase function needed to start VerseSync
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
 
-// Imports Firestore tools for connecting, creating documents, and reading documents
+// Imports the Firestore tools used by VerseSync
 import {
     getFirestore,
     collection,
@@ -12,7 +12,8 @@ import {
     deleteDoc
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
-// Identifies the Firebase project that VerseSync should connect to
+
+// Firebase project configuration
 const firebaseConfig = {
     apiKey: "AIzaSyA5afYG6rzXLbWuhKaXZzD81l6dgyupQKQ",
     authDomain: "versesync-4fdbd.firebaseapp.com",
@@ -20,80 +21,79 @@ const firebaseConfig = {
     storageBucket: "versesync-4fdbd.firebasestorage.app",
     messagingSenderId: "112642198904",
     appId: "1:112642198904:web:b9854a2cd291232f808c8d"
-  };
+};
 
-// Initializes Firebase using the VerseSync project configuration
+
+// Starts Firebase for VerseSync
 const app = initializeApp(firebaseConfig);
 
-// Creates a reference to the Firestore database connected to this app
+
+// Connects VerseSync to Firestore
 const db = getFirestore(app);
 
 
-/* =========================================================
+
+/* =========================
    DATA
-   ========================================================= */
+   ========================= */
 
 /*
-Stores the study schedule used by the website.
-
-Each object represents one study week and contains:
-- weekNumber: internal number used to connect insights to a week
-- weekDate: date range shown to the user
-- scripture: reading assignment shown on the page
-- scriptureUrl: Gospel Library / Come, Follow Me link for that week
+Stores the weekly study schedule.
+Each object represents one study week.
 */
 const studyWeeks = [
     {
         weekNumber: 1,
-        weekDate: "October 12–18",
-        scripture: "Isaiah 58–66",
-        scriptureUrl: "https://beta.churchofjesuschrist.org/study/manual/come-follow-me-for-home-and-church-old-testament-2026/42?lang=eng",
-    },
-    {
-        weekNumber: 2,
-        weekDate: "October 19–25",
-        scripture: "Jeremiah 1–3; 7; 16–18; 20",
-        scriptureUrl: "https://beta.churchofjesuschrist.org/study/manual/come-follow-me-for-home-and-church-old-testament-2026/43?lang=eng",
-    },
-    {
-        weekNumber: 3,
         weekDate: "October 26–November 1",
         scripture: "Jeremiah 31–33; 36–39; Lamentations 1; 3",
-        scriptureUrl: "https://beta.churchofjesuschrist.org/study/manual/come-follow-me-for-home-and-church-old-testament-2026/44?lang=eng",
-    },
+        scriptureUrl: "https://beta.churchofjesuschrist.org/study/manual/come-follow-me-for-home-and-church-old-testament-2026/44?lang=eng"
+    },    
     {
-        weekNumber: 4,
+        weekNumber: 2,
         weekDate: "November 2–8",
         scripture: "Ezekiel 1–3; 33–34; 36–37; 47",
         scriptureUrl: "https://beta.churchofjesuschrist.org/study/manual/come-follow-me-for-home-and-church-old-testament-2026/45?lang=eng",
     },
     {
-        weekNumber: 5,
+        weekNumber: 3,
         weekDate: "November 9–15",
         scripture: "Daniel 1–7",
         scriptureUrl: "https://beta.churchofjesuschrist.org/study/manual/come-follow-me-for-home-and-church-old-testament-2026/46?lang=eng",
-    }
+    },
+    {
+        weekNumber: 4,
+        weekDate: "November 16-22",
+        scripture: "Hosea 1–6; 10–14; Joel",
+        scriptureUrl: "https://beta.churchofjesuschrist.org/study/manual/come-follow-me-for-home-and-church-old-testament-2026/47?lang=eng"
+    },
+    {
+        weekNumber: 5,
+        weekDate: "November 23-29",
+        scripture: "Amos; Obadiah; Jonah",
+        scriptureUrl: "https://beta.churchofjesuschrist.org/study/manual/come-follow-me-for-home-and-church-old-testament-2026/48?lang=eng"
+    }    
 ];
 
 
 /*
-Stores every submitted insight.
-
-"let" is used instead of "const" because this array may be replaced
-with previously saved data from localStorage when the page loads.
+Stores the insights currently loaded from Firestore.
+This array is replaced whenever fresh data is loaded.
 */
 let insights = [];
 
 
-// Loads all saved insights from Firestore into the local insights array
+// Loads all saved insights from Firestore
 async function loadInsights() {
     const querySnapshot = await getDocs(collection(db, "insights"));
 
-    // resets the existing array back to empty before loading fresh data from Firestore.
+    // Clears old local data before loading fresh Firestore data
     insights = [];
 
     querySnapshot.forEach(function(document) {
-        insights.push({id: document.id, ...document.data()});
+        insights.push({
+            id: document.id,
+            ...document.data()
+        });
     });
 
     displayInsights();
@@ -101,126 +101,91 @@ async function loadInsights() {
 
 
 /*
-Tracks which study week the user is currently viewing.
-The visible week numbers start at 1, while array indexes start at 0.
-That is why studyWeeks[currentWeek - 1] is used throughout the file.
+Tracks which study week the user is viewing.
+Week numbers start at 1 while array indexes start at 0.
 */
 let currentWeek = 1;
 
 
 
-/* =========================================================
+/* =========================
    DOM ELEMENT REFERENCES
-   ========================================================= */
-
-/*
-These variables connect JavaScript to specific HTML elements.
-document.querySelector() finds an element in the page so JavaScript
-can read from it, change it, or listen for user actions.
-*/
+   ========================= */
 
 // Week navigation buttons
 const nextWeekButton = document.querySelector("#next-week");
 const previousWeekButton = document.querySelector("#previous-week");
 
-// Current week's date and scripture reading
+// Current week information
 const weekTitle = document.querySelector("#week-title");
 const weekReading = document.querySelector("#week-reading");
 
-// Link that opens the current week's Gospel Library reading
+// Current week's scripture link
 const scriptureLink = document.querySelector("#scripture-link");
 
-// Main insight form inputs
+// Insight form inputs
 const nameInput = document.querySelector("#name");
 const scriptureInput = document.querySelector("#scripture_reference");
 const insightInput = document.querySelector("#insight");
 
-// Main form used to submit new insights
+// Insight submission form
 const insightForm = document.querySelector("#insight-form");
 
-// Container where JavaScript-generated insight cards are displayed
+// Container for the insight cards
 const insightsList = document.querySelector("#insights-list");
 
 
 
-/* =========================================================
+/* =========================
    DISPLAY FUNCTIONS
-   ========================================================= */
-
+   ========================= */
 
 /*
-Updates the week information shown on the page.
-
-Whenever currentWeek changes, this function updates:
-- the date range
-- the scripture reading
-- the scripture link
+Updates the date, scripture reading, and link
+for the currently selected week.
 */
 function updateWeekDisplay() {
 
-    /*
-    currentWeek starts at 1, but arrays start at index 0.
-    Subtracting 1 lets us access the correct studyWeeks object
-    without changing currentWeek itself.
-    */
+    // Subtract 1 because array indexes start at 0
     weekTitle.textContent = studyWeeks[currentWeek - 1].weekDate;
 
-    // Displays the scripture reading assigned to the current week.
+    // Displays the scripture reading
     weekReading.textContent =
         `Read ${studyWeeks[currentWeek - 1].scripture}`;
 
-    // Updates the Gospel Library link to match the current week.
+    // Updates the scripture study link
     scriptureLink.href =
         studyWeeks[currentWeek - 1].scriptureUrl;
 }
 
 
 /*
-Rebuilds the visible insight cards.
-
-This function is called:
-- when the page first loads
-- when the user changes weeks
-- after an insight is submitted
-- after a reply is submitted
-
-Instead of manually editing the HTML, JavaScript recreates the visible
-cards using the information stored inside the insights array.
+Rebuilds the visible insight cards
+using the current insights array.
 */
 function displayInsights() {
 
-    /*
-    Removes the currently displayed cards before rebuilding them.
-
-    Without this, calling displayInsights() multiple times would
-    repeatedly add duplicate cards to the page.
-    */
+    // Clears the current cards before rebuilding them
     insightsList.innerHTML = "";
 
 
-    /*
-    Creates a new array containing only insights that belong
-    to the week currently being viewed.
-    */
+    // Keeps only insights belonging to the current week
     const currentWeekInsights = insights.filter(function(insight) {
         return insight.weekNumber === currentWeek;
     });
 
 
-    /*
-    Goes through each insight belonging to the current week
-    and builds one visible insight card for it.
-    */
+    // Builds one card for each insight
     currentWeekInsights.forEach(function(insight) {
 
         /* -------------------------
-           CREATE INSIGHT CARD
+           INSIGHT CARD
            ------------------------- */
 
-        // Creates the outer <div> that will contain one complete insight.
+        // Creates one insight card
         const insightCard = document.createElement("div");
 
-        // Applies the CSS styling defined for .insight-card.
+        // Applies the card styling
         insightCard.classList.add("insight-card");
 
 
@@ -228,13 +193,12 @@ function displayInsights() {
            AUTHOR
            ------------------------- */
 
-        // Creates a paragraph that will display the insight author's name.
+        // Creates the author name
         const authorName = document.createElement("p");
 
-        // Applies the CSS styling for author names.
         authorName.classList.add("author-name");
 
-        // Inserts the current insight object's author into the paragraph.
+        // Displays the author
         authorName.textContent = insight.author;
 
 
@@ -242,13 +206,11 @@ function displayInsights() {
            SCRIPTURE REFERENCE
            ------------------------- */
 
-        // Creates a paragraph for the scripture reference.
+        // Creates the scripture reference
         const scriptureReference = document.createElement("p");
 
-        // Applies the CSS styling for scripture references.
         scriptureReference.classList.add("scripture-reference");
 
-        // Displays the scripture reference stored in this insight object.
         scriptureReference.textContent = insight.scripture;
 
 
@@ -256,154 +218,144 @@ function displayInsights() {
            INSIGHT TEXT
            ------------------------- */
 
-        // Creates a paragraph for the main insight/testimony text.
+        // Creates the main insight text
         const insightText = document.createElement("p");
 
-        // Applies the CSS styling for the insight body.
         insightText.classList.add("insight-text");
 
-        // Displays the text stored in the current insight object.
         insightText.textContent = insight.text;
 
-        // Creates a button that will let the user edit this insight
+
+        /* -------------------------
+           EDIT BUTTON
+           ------------------------- */
+
+        // Creates the Edit button
         const editButton = document.createElement("button");
 
         editButton.type = "button";
         editButton.textContent = "Edit";
 
+
+        // Updates this insight when Edit is clicked
         editButton.addEventListener("click", async function() {
             const updatedText = prompt("Edit your insight:", insight.text);
 
+            // Stops if the user cancels or enters empty text
             if (!updatedText || !updatedText.trim()) {
                 return;
             }
+
+            // Updates this specific Firestore document
             await updateDoc(doc(db, "insights", insight.id), {
                 text: updatedText
             });
 
+            // Reloads the latest Firestore data
             await loadInsights();
         });
 
-        // Creates a button that lets the user delete this insight
+
+        /* -------------------------
+           DELETE BUTTON
+           ------------------------- */
+
+        // Creates the Delete button
         const deleteButton = document.createElement("button");
+
         deleteButton.type = "button";
         deleteButton.textContent = "Delete";
 
-        deleteButton.addEventListener("click", async function() {
-            const confirmed = confirm("Are you sure you want to delete this insight?");
 
+        // Deletes this insight when Delete is clicked
+        deleteButton.addEventListener("click", async function() {
+            const confirmed = confirm(
+                "Are you sure you want to delete this insight?"
+            );
+
+            // Stops if the user chooses Cancel
             if (!confirmed) {
                 return;
             }
 
+            // Deletes this specific Firestore document
             await deleteDoc(doc(db, "insights", insight.id));
 
+            // Reloads the latest Firestore data
             await loadInsights();
         });
-    
 
-        /* =====================================================
+
+        /* =========================
            REPLIES
-           ===================================================== */
+           ========================= */
 
-        /*
-        Creates a container that will hold every reply
-        belonging specifically to this insight.
-        */
+        // Container for this insight's replies
         const repliesList = document.createElement("div");
         repliesList.classList.add("replies-list");
 
 
-        /*
-        Older insights may have been saved before the replies feature
-        existed. If an insight does not yet contain a replies array,
-        create an empty one so the rest of the code can safely use it.
-        */
+        // Creates an empty replies array if one does not exist
         if (!insight.replies) {
             insight.replies = [];
         }
 
 
-        /*
-        Loops through every reply belonging to this insight
-        and creates the HTML elements needed to display it.
-        */
+        // Displays each reply
         insight.replies.forEach(function(reply) {
 
-            // Creates the paragraph displaying the reply author's name.
+            // Reply author's name
             const replyAuthor = document.createElement("p");
 
-            // Applies the reply-author CSS styling.
             replyAuthor.classList.add("reply-author");
 
-            // Displays the author's name from the current reply object.
             replyAuthor.textContent = reply.author;
 
 
-            // Creates the paragraph displaying the reply message.
+            // Reply message
             const replyMessage = document.createElement("p");
 
-            // Applies the reply-text CSS styling.
             replyMessage.classList.add("reply-text");
 
-            // Displays the message from the current reply object.
             replyMessage.textContent = reply.text;
 
 
-            /*
-            Places both reply paragraphs inside this insight's
-            replies container.
-            */
+            // Adds the reply to the replies container
             repliesList.append(replyAuthor, replyMessage);
         });
 
 
-        /* =====================================================
+        /* =========================
            REPLY FORM
-           ===================================================== */
+           ========================= */
 
-        /*
-        Creates a separate reply form for this specific insight.
-
-        Because this code runs once for every insight, each card gets
-        its own form and replies are added to the correct insight.
-        */
+        // Creates a reply form for this insight
         const replyForm = document.createElement("form");
         replyForm.classList.add("reply-form");
 
 
-        // Creates an input where the person replying enters their name.
+        // Input for the person's name
         const replyNameInput = document.createElement("input");
 
-        // Makes this a normal text input.
         replyNameInput.type = "text";
 
-        // Shows helpful temporary text before the user types.
         replyNameInput.placeholder = "Your name";
 
 
-        // Creates a textarea where the user can type their reply.
+        // Text box for the reply
         const replyTextInput = document.createElement("textarea");
 
-        // Shows helpful temporary text before the user types.
         replyTextInput.placeholder = "Write a reply...";
 
 
-        // Creates the button used to submit the reply form.
+        // Creates the Reply button
         const replyButton = document.createElement("button");
 
-        /*
-        Makes the button submit the reply form when clicked
-        and displays the word "Reply" on the button.
-        */
         replyButton.type = "submit";
         replyButton.textContent = "Reply";
 
 
-        /*
-        Places the name field, reply textarea, and submit button
-        inside the reply form.
-        */
+        // Adds the fields and button to the form
         replyForm.append(
             replyNameInput,
             replyTextInput,
@@ -411,80 +363,56 @@ function displayInsights() {
         );
 
 
-        /* =====================================================
-           REPLY FORM EVENT
-           ===================================================== */
+        /* =========================
+           REPLY SUBMISSION
+           ========================= */
 
-        /*
-        Runs whenever this specific reply form is submitted.
-        */
-        replyForm.addEventListener("submit", function(event) {
+        // Runs when this reply form is submitted
+        replyForm.addEventListener("submit", async function(event) {
 
-            /*
-            Stops the browser's normal form behavior,
-            which would otherwise refresh the page.
-            */
+            // Prevents the page from refreshing
             event.preventDefault();
 
 
-            // Reads the current values typed into the reply form.
+            // Gets the reply form values
             const replyName = replyNameInput.value;
             const replyText = replyTextInput.value;
 
 
-            /*
-            Prevents blank replies.
-
-            trim() removes spaces from the beginning and end,
-            so a user cannot submit a field containing only spaces.
-            */
+            // Prevents empty or space-only replies
             if (!replyName.trim() || !replyText.trim()) {
                 console.log("Please complete all reply fields.");
                 return;
             }
 
 
-            /*
-            Packages the submitted reply information into one object.
-            */
+            // Creates the new reply object
             const newReply = {
                 author: replyName,
                 text: replyText
             };
 
 
-            /*
-            Adds the new reply to the replies array belonging
-            to this specific insight.
-            */
+            // Adds the new reply to this insight
             insight.replies.push(newReply);
 
 
-            /*
-            Saves the entire updated insights array.
-
-            Replies are nested inside their parent insight objects,
-            so saving insights also saves all replies.
-            */
-            localStorage.setItem("insights", JSON.stringify(insights));
+            // Saves the updated replies to Firestore
+            await updateDoc(doc(db, "insights", insight.id), {
+                replies: insight.replies
+            });
 
 
-            /*
-            Rebuilds the insight cards immediately so the newly
-            submitted reply appears without refreshing the page.
-            */
-            displayInsights();  
+            // Reloads the latest Firestore data
+            await loadInsights();
         });
 
 
-        /* =====================================================
-           BUILD FINAL INSIGHT CARD
-           ===================================================== */
+        /* =========================
+           BUILD INSIGHT CARD
+           ========================= */
 
-        /*
-        Places the main insight information and existing replies
-        inside the insight card.
-        */
+        // Adds the insight information to the card
         insightCard.append(
             authorName,
             scriptureReference,
@@ -495,71 +423,52 @@ function displayInsights() {
         );
 
 
-        // Places the reply form underneath the insight and its replies.
+        // Adds the reply form below the insight
         insightCard.append(replyForm);
 
 
-        /*
-        Adds the completed insight card to the main insight container,
-        making it visible on the webpage.
-        */
+        // Adds the completed card to the page
         insightsList.append(insightCard);
     });
 }
 
 
 
-/* =========================================================
+/* =========================
    INITIAL PAGE SETUP
-   ========================================================= */
+   ========================= */
 
-/*
-Runs once when the JavaScript file first loads.
-
-This makes sure the page displays the correct date,
-scripture reading, and scripture link immediately.
-*/
+// Displays the correct week when the page loads
 updateWeekDisplay();
 
 
-/*
-Displays any insights loaded from Firestore for the
-currently selected week when the page first opens.
-*/
+// Loads saved Firestore insights when the page opens
 loadInsights();
 
 
 
-/* =========================================================
+/* =========================
    EVENT LISTENERS
-   ========================================================= */
+   ========================= */
 
 
 /* -------------------------
    NEXT WEEK BUTTON
    ------------------------- */
 
-/*
-Runs whenever the user clicks Next Week.
-*/
+// Runs when Next Week is clicked
 nextWeekButton.addEventListener("click", function() {
 
-    /*
-    Prevents currentWeek from moving beyond the number
-    of weeks stored in the studyWeeks array.
-    */
+    // Prevents moving past the final study week
     if (currentWeek < studyWeeks.length) {
 
-        // Moves forward one week.
+        // Moves forward one week
         currentWeek++;
 
-        // Updates the visible week date, reading, and scripture link.
+        // Updates the displayed week
         updateWeekDisplay();
 
-        /*
-        Re-renders the insight list so only posts belonging
-        to the newly selected week are shown.
-        */
+        // Displays insights for the new week
         displayInsights();
     }
 });
@@ -569,59 +478,43 @@ nextWeekButton.addEventListener("click", function() {
    PREVIOUS WEEK BUTTON
    ------------------------- */
 
-/*
-Runs whenever the user clicks Previous Week.
-*/
+// Runs when Previous Week is clicked
 previousWeekButton.addEventListener("click", function() {
 
-    /*
-    Prevents the user from navigating backward past Week 1.
-    */
+    // Prevents moving before Week 1
     if (currentWeek > 1) {
 
-        // Moves backward one week.
+        // Moves backward one week
         currentWeek--;
 
-        // Updates the visible week date, reading, and scripture link.
+        // Updates the displayed week
         updateWeekDisplay();
 
-        /*
-        Re-renders the insight list so only posts belonging
-        to the selected week are shown.
-        */
+        // Displays insights for the selected week
         displayInsights();
     }
 });
 
 
-/* =========================================================
-   MAIN INSIGHT FORM
-   ========================================================= */
 
-/*
-Runs whenever the user submits a new insight.
-*/
+/* =========================
+   MAIN INSIGHT FORM
+   ========================= */
+
+// Runs when a new insight is submitted
 insightForm.addEventListener("submit", async function(event) {
 
-    /*
-    Stops the browser's normal form behavior,
-    which would refresh the page.
-    */
+    // Prevents the page from refreshing
     event.preventDefault();
 
 
-    /*
-    Reads the current values entered into the three form fields.
-    */
+    // Gets the values entered in the form
     const userName = nameInput.value;
     const scriptureReference = scriptureInput.value;
     const insightText = insightInput.value;
 
 
-    /*
-    Prevents the form from submitting if any required field
-    is empty or contains only spaces.
-    */
+    // Prevents empty or space-only submissions
     if (
         !userName.trim() ||
         !scriptureReference.trim() ||
@@ -633,14 +526,8 @@ insightForm.addEventListener("submit", async function(event) {
 
 
     /*
-    Creates one insight object containing all information
-    needed to display and save the post.
-
-    weekNumber connects the insight to whichever study week
-    the user was viewing when the insight was submitted.
-
-    replies starts as an empty array and will later hold
-    reply objects belonging to this specific insight.
+    Creates the new insight object.
+    weekNumber connects it to the current study week.
     */
     const newInsight = {
         author: userName,
@@ -651,16 +538,15 @@ insightForm.addEventListener("submit", async function(event) {
     };
 
 
-    // Saves the new insight to Firestore so it can be shared across devices
+    // Saves the new insight to Firestore
     await addDoc(collection(db, "insights"), newInsight);
 
-    // Reloads the latest Firestore data so the new insight appears immediately
+
+    // Reloads Firestore so the new insight appears immediately
     await loadInsights();
 
-    /*
-    Clears all three form fields after a successful submission
-    so the form is ready for another insight.
-    */
+
+    // Clears the form after the insight is saved
     nameInput.value = "";
     scriptureInput.value = "";
     insightInput.value = "";
