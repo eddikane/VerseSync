@@ -1,0 +1,26 @@
+{
+  "name": "scripturestudy",
+  "version": "1.0.0",
+  "description": "VerseSync is a collaborative scripture-study web application designed to help individuals and groups stay organized, share insights, and study together in one place.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eddikane/VerseSync.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/eddikane/VerseSync/issues"
+  },
+  "homepage": "https://github.com/eddikane/VerseSync#readme",
+  "dependencies": {
+    "ejs": "^7.0.2",
+    "express": "^5.3.0",
+    "firebase-admin": "^14.5.0"
+  }
+}

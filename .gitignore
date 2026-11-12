@@ -47,6 +47,9 @@ build/Release
 # Dependency directories
 node_modules/
 
+# Firebase service account credentials
+serviceAccountKey.json
+
 # Optional npm cache directory
 .npm
 

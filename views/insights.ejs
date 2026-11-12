@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+    <header>
+        <h1><%= pageTitle %></h1>
+    </header>
+
+    <main>
+            <% insights.forEach(function(insight) { %>
+
+        <div class="insight-card">
+            <h2><%= insight.scripture %></h2>
+            <p><strong><%= insight.author %></strong></p>
+            <p><%= insight.text %></p>
+        </div>
+
+    <% }); %>
+    
+    
+</body>
+</html>
