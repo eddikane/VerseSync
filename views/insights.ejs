@@ -13,16 +13,31 @@
     </header>
 
     <main>
-            <% insights.forEach(function(insight) { %>
 
-        <div class="insight-card">
-            <h2><%= insight.scripture %></h2>
-            <p><strong><%= insight.author %></strong></p>
-            <p><%= insight.text %></p>
-        </div>
+        <form action="/insights" method="POST">
+            <label for="author">Name:</label>
+            <input type="text" id="author" name="author" required>
 
-    <% }); %>
+            <label for="scripture">Scripture:</label>
+            <input type="text" id="scripture" name="scripture" required>
+
+            <label for="text">Insight:</label>
+            <textarea id="text" name="text" required></textarea>
+
+            <button type="submit">Submit Insight</button>
+        </form>
+
+        <% insights.forEach(function(insight) { %>
+
+            <div class="insight-card">
+                <h2><%= insight.scripture %></h2>
+                <p><strong><%= insight.author %></strong></p>
+                <p><%= insight.text %></p>
+            </div>
+
+        <% }); %>
     
+    </main>
     
 </body>
 </html>
