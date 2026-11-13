@@ -41,178 +41,128 @@
 
 <body>
 
-    <!-- =====================================================
-         PAGE HEADER
-         ===================================================== -->
+    <!--
+    appName comes from server.js.
 
+    <%= ... %> is EJS syntax used to display a value
+    inside the generated HTML.
+    -->
     <header>
-        <!-- Main website title -->
         <h1><%= appName %></h1>
     </header>
 
 
-    <!-- =====================================================
-         MAIN WEBSITE CONTENT
-         ===================================================== -->
-
     <main>
 
-
-        <!-- =================================================
-             CURRENT WEEK SECTION
-             ================================================= -->
+        <!-- =====================================================
+             CURRENT STUDY WEEK
+             ===================================================== -->
 
         <!--
-        Displays the currently selected study week's:
-        - date range
-        - scripture reading
-        - Come, Follow Me link
-        - previous/next navigation buttons
-
-        JavaScript updates this section whenever currentWeek changes.
+        currentWeek is selected in server.js based on the
+        week number in the URL.
         -->
         <section id="this-week">
 
-            <!-- JavaScript replaces this with the current week's date range -->
-            <h2 id="week-title">This Week</h2>
+            <h2>This Week</h2>
 
-            <!-- JavaScript inserts the current week's scripture reading here -->
-            <p id="week-reading"></p>
+            <!-- Display the dates and scripture reading for the selected week -->
+            <p>
+                <strong id="date"><%= currentWeek.dates %>: 
+                <%= currentWeek.scripture %></strong>
+            </p>
 
 
-            <!--
-            Opens the Come, Follow Me reading for the selected week.
-
-            JavaScript dynamically changes the href so the link
-            always matches the week currently being viewed.
-            -->
-            <a id="scripture-link" href="#" target="_blank">
+            <!-- Opens the official Come, Follow Me page in another tab -->
+            <a
+                class="primary-button"
+                id="scripture-link"
+                href="https://www.churchofjesuschrist.org/study/manual/come-follow-me-for-home-and-church-old-testament-2026"
+                target="_blank"
+            >
                 Come, Follow Me
             </a>
 
 
-            <!--
-            Navigation buttons used by JavaScript to move
-            backward and forward through studyWeeks.
-            -->
-            <nav>
-                <button type="button" id="previous-week">
-                    Previous Week
-                </button>
+            <!-- =================================================
+                 WEEK NAVIGATION
+                 ================================================= -->
 
-                <button type="button" id="next-week">
-                    Next Week
-                </button>
+            <nav class="week-navigation">
+
+                <!--
+                Only show Previous Week if the user is not
+                already viewing the first week.
+                -->
+                <% if (currentWeek.weekNumber > 1) { %>
+
+                    <!--
+                    The week number is added to the URL as a query parameter.
+                    Example: /?week=2
+                    -->
+                    <a class="primary-button" href="/?week=<%= weekNumber - 1 %>">
+                        Previous Week
+                    </a>
+
+                <% } %>
+                    
+
+                <!--
+                Only show Next Week when another week exists.
+                -->
+                <% if (weekNumber < totalWeeks) { %>
+
+                    <a class="primary-button" href="/?week=<%= weekNumber + 1 %>">
+                        Next Week
+                    </a>
+
+                <% } %>
+
             </nav>
 
         </section>
 
 
+        <!-- =====================================================
+             SHARED INSIGHTS LINK
+             ===================================================== -->
 
-        <!-- =================================================
-             SHARE AN INSIGHT SECTION
-             ================================================= -->
-
-        <!--
-        Allows the user to create a new scripture insight.
-
-        JavaScript listens for this form's submit event,
-        creates an insight object, saves it, and displays it.
-        -->
+        <!-- Links the home page to the second dynamic page -->
         <section id="share-insight">
 
             <h2>Share An Insight</h2>
 
+            <p>
+                Share your scripture insights and read what others have contributed.
+            </p>
 
-            <!--
-            The form ID lets JavaScript attach a submit event listener.
-            -->
-            <form id="insight-form">
-
-
-                <!--
-                The label's "for" value matches the input's ID.
-                This connects the label to the correct form field.
-                -->
-                <label for="name">Name</label>
-                <input id="name" type="text">
-
-
-                <!-- Scripture reference associated with the user's insight -->
-                <label for="scripture_reference">
-                    Scripture Reference
-                </label>
-
-                <input id="scripture_reference" type="text">
-
-
-                <!--
-                Textarea is used instead of a normal input because
-                an insight may contain multiple sentences or paragraphs.
-                -->
-                <label for="insight">Insight</label>
-                <textarea id="insight"></textarea>
-
-
-                <!--
-                Because this button is type="submit", clicking it
-                triggers the insight form's submit event in JavaScript.
-                -->
-                <button type="submit">
-                    Submit
-                </button>
-
-            </form>
-
-        </section>
-
-
-
-        <!-- =================================================
-             INSIGHTS SECTION
-             ================================================= -->
-
-        <section id="insights">
-
-            <h2>Insights</h2>
-
-
-            <!--
-            JavaScript dynamically inserts insight cards inside this div.
-
-            The HTML does not contain hard-coded insight cards because
-            they are created from the insights array in script.js.
-            -->
-            <div id="insights-list"></div>
+            <!-- Express handles this URL using the GET /insights route -->
+            <a class="primary-button" href="/insights">
+                Insights
+            </a>
 
         </section>
 
     </main>
 
 
-
     <!-- =====================================================
-         PAGE FOOTER
+         FOOTER
          ===================================================== -->
 
     <footer>
-        <p>VerseSync</p>
+
+        <p><strong>VerseSync</strong> — Study. Share. Grow.</p>
+
+        <!-- Navigation between the two main pages -->
+        <nav>
+            <a class="primary-button" href="/">Home</a>
+            <a class="primary-button" href="/insights">Shared Insights</a>
+        </nav>
+
+        <p>&copy; 2026 Edward Kane</p>
+
     </footer>
-
-
-
-    <!-- =====================================================
-         JAVASCRIPT
-         ===================================================== -->
-
-    <!--
-    Loads the JavaScript after the HTML content.
-
-    This allows JavaScript to safely find the HTML elements
-    using document.querySelector().
-    type="module" loads script.js as a module so Firebase imports can be used -->
-    
-    <script type="module" src="script.js"></script>
 
 </body>
 

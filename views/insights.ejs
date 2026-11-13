@@ -1,43 +1,418 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- pageTitle is provided by server.js -->
     <title><%= pageTitle %></title>
-    <link rel="stylesheet" href="/styles.css">
+
+    <!-- Loads the CSS file from the public folder -->
+    <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
 
     <header>
         <h1><%= pageTitle %></h1>
     </header>
 
+
     <main>
 
-        <form action="/insights" method="POST">
-            <label for="author">Name:</label>
-            <input type="text" id="author" name="author" required>
+        <!-- =====================================================
+             WEEK SELECTOR
+             ===================================================== -->
 
-            <label for="scripture">Scripture:</label>
-            <input type="text" id="scripture" name="scripture" required>
+        <section id="week-selector">
 
-            <label for="text">Insight:</label>
-            <textarea id="text" name="text" required></textarea>
+            <!-- Display the currently selected study week -->
+            <h2><%= currentWeek.dates %></h2>
 
-            <button type="submit">Submit Insight</button>
-        </form>
+            <p>
+                <%= currentWeek.scripture %>
+            </p>
 
-        <% insights.forEach(function(insight) { %>
 
-            <div class="insight-card">
-                <h2><%= insight.scripture %></h2>
-                <p><strong><%= insight.author %></strong></p>
-                <p><%= insight.text %></p>
-            </div>
+            <!--
+            Lets the user jump directly to a study week.
 
-        <% }); %>
-    
+            The selected week is sent to Express as a GET
+            query parameter such as /insights?week=2.
+            -->
+            <form action="/insights" method="GET">
+
+                <label for="view-week">View Study Week:</label>
+
+                <select id="view-week" name="week">
+
+                    <!--
+                    Loop through studyWeeks and create one
+                    dropdown option for every study week.
+                    -->
+                    <% studyWeeks.forEach(function(week) { %>
+
+                        <option
+                            value="<%= week.weekNumber %>"
+
+                            <!--
+                            Keep the currently viewed week selected
+                            in the dropdown.
+                            -->
+                            <%= week.weekNumber === weekNumber ? "selected" : "" %>
+                        >
+                            <%= week.dates %>
+                        </option>
+
+                    <% }); %>
+
+                </select>
+
+                <button type="submit">
+                    View Week
+                </button>
+
+            </form>
+
+
+            <!-- =================================================
+                 PREVIOUS / NEXT WEEK NAVIGATION
+                 ================================================= -->
+
+            <nav class="week-navigation">
+
+                <!-- Only show Previous Week when a previous week exists -->
+                <% if (weekNumber > 1) { %>
+
+                    <a
+                        class="primary-button"
+                        href="/insights?week=<%= weekNumber - 1 %>"
+                    >
+                        Previous Week
+                    </a>
+
+                <% } %>
+
+
+                <!-- Only show Next Week when another week exists -->
+                <% if (weekNumber < totalWeeks) { %>
+
+                    <a
+                        class="primary-button"
+                        href="/insights?week=<%= weekNumber + 1 %>"
+                    >
+                        Next Week
+                    </a>
+
+                <% } %>
+
+            </nav>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             SUBMIT A NEW INSIGHT
+             ===================================================== -->
+
+        <section id="share-insight">
+
+            <h2>Share An Insight</h2>
+
+
+            <!--
+            This form sends its information to the POST /insights
+            route in server.js.
+
+            Express saves the submitted information to Firestore.
+            -->
+            <form action="/insights" method="POST">
+
+                <!-- Person submitting the insight -->
+                <label for="author">Name:</label>
+
+                <input
+                    type="text"
+                    id="author"
+                    name="author"
+                    required
+                >
+
+
+                <!-- Scripture reference connected to the insight -->
+                <label for="scripture">Scripture:</label>
+
+                <input
+                    type="text"
+                    id="scripture"
+                    name="scripture"
+                    required
+                >
+
+
+                <!-- Study week the insight belongs to -->
+                <label for="weekNumber">Study Week:</label>
+
+                <select
+                    id="weekNumber"
+                    name="weekNumber"
+                    required
+                >
+
+                    <!--
+                    Use the studyWeeks array from server.js
+                    instead of manually writing every option.
+                    -->
+                    <% studyWeeks.forEach(function(week) { %>
+
+                        <option
+                            value="<%= week.weekNumber %>"
+                            <%= week.weekNumber === weekNumber ? "selected" : "" %>
+                        >
+                            <%= week.dates %>
+                        </option>
+
+                    <% }); %>
+
+                </select>
+
+
+                <!-- Text of the user's scripture insight -->
+                <label for="text">Insight:</label>
+
+                <textarea
+                    id="text"
+                    name="text"
+                    required
+                ></textarea>
+
+
+                <button
+                    class="primary-button"
+                    type="submit"
+                >
+                    Submit Insight
+                </button>
+
+            </form>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             INSIGHTS FOR SELECTED WEEK
+             ===================================================== -->
+
+        <section id="insights">
+
+            <h2>Insights</h2>
+
+
+            <!--
+            If Firestore returned no insights for this week,
+            show a message instead of leaving the section empty.
+            -->
+            <% if (insights.length === 0) { %>
+
+                <p>
+                    No insights have been shared for this week yet.
+                </p>
+
+            <% } %>
+
+
+
+            <!--
+            Loop through the insights array sent from server.js.
+
+            One insight card is created for every Firestore
+            document returned for the selected week.
+            -->
+            <% insights.forEach(function(insight) { %>
+
+                <div class="insight-card">
+
+                    <!-- Scripture connected to this insight -->
+                    <h2><%= insight.scripture %></h2>
+
+                    <!-- Person who submitted it -->
+                    <p>
+                        <strong><%= insight.author %></strong>
+                    </p>
+
+                    <!-- The actual insight -->
+                    <p><%= insight.text %></p>
+
+
+
+                    <!-- =================================================
+                         EDIT AND DELETE CONTROLS
+                         ================================================= -->
+
+                    <div class="insight-actions">
+
+
+                        <!--
+                        <details> creates a section that can open
+                        and close without needing JavaScript.
+                        -->
+                        <details class="edit-details">
+
+                            <!-- Clicking this opens the edit form -->
+                            <summary class="primary-button">
+                                Edit Insight
+                            </summary>
+
+
+                            <!--
+                            This form sends the edited information to:
+
+                            /insights/:id/edit
+
+                            insight.id is the unique Firestore document ID.
+                            -->
+                            <form
+                                class="edit-form"
+                                action="/insights/<%= insight.id %>/edit"
+                                method="POST"
+                            >
+
+                                <!--
+                                This field is hidden from the user.
+
+                                It tells the server which study week
+                                to return to after saving the changes.
+                                -->
+                                <input
+                                    type="hidden"
+                                    name="weekNumber"
+                                    value="<%= weekNumber %>"
+                                >
+
+
+                                <!-- Current author is placed inside the input -->
+                                <label for="author-<%= insight.id %>">
+                                    Edit Name:
+                                </label>
+
+                                <input
+                                    id="author-<%= insight.id %>"
+                                    type="text"
+                                    name="author"
+                                    value="<%= insight.author %>"
+                                    required
+                                >
+
+
+                                <!-- Current scripture reference -->
+                                <label for="scripture-<%= insight.id %>">
+                                    Edit Scripture:
+                                </label>
+
+                                <input
+                                    id="scripture-<%= insight.id %>"
+                                    type="text"
+                                    name="scripture"
+                                    value="<%= insight.scripture %>"
+                                    required
+                                >
+
+
+                                <!-- Current insight text -->
+                                <label for="text-<%= insight.id %>">
+                                    Edit Insight:
+                                </label>
+
+                                <textarea
+                                    id="text-<%= insight.id %>"
+                                    name="text"
+                                    required
+                                ><%= insight.text %></textarea>
+
+
+                                <!-- Submit the edited values to the server -->
+                                <button type="submit">
+                                    Save Changes
+                                </button>
+
+                            </form>
+
+                        </details>
+
+
+
+                        <!--
+                        DELETE FORM
+
+                        The Firestore document ID is included in the URL
+                        so the server knows exactly which insight to delete.
+                        -->
+                        <form
+                            class="delete-form"
+                            action="/insights/<%= insight.id %>/delete"
+                            method="POST"
+                        >
+
+                            <!--
+                            Keep track of the current study week so the
+                            user returns to it after deleting the insight.
+                            -->
+                            <input
+                                type="hidden"
+                                name="weekNumber"
+                                value="<%= weekNumber %>"
+                            >
+
+
+                            <button type="submit">
+                                Delete Insight
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            <% }); %>
+
+        </section>
+
+
+        <!-- Return to the VerseSync home page -->
+        <a class="primary-button" href="/">
+            Back to Home
+        </a>
+
     </main>
-    
+
+
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
+
+    <footer>
+
+        <p>
+            <strong>VerseSync</strong> — Study. Share. Grow.
+        </p>
+
+        <!-- Links to the two main pages -->
+        <nav>
+            <a href="/">Home</a>
+            <a href="/insights">Shared Insights</a>
+        </nav>
+
+        <p>
+            &copy; 2026 Edward Kane
+        </p>
+
+    </footer>
+
 </body>
+
 </html>

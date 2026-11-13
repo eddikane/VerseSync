@@ -39,9 +39,13 @@ h2 {
 
 /* Section heading size */
 h2 {
-    font-size: 42px;
+    font-size: 36px;
 }
 
+#date {
+    font-size: 36px;
+    font-style: italic;
+}
 
 
 /* =========================================================
@@ -73,12 +77,16 @@ main {
    ========================================================= */
 
 /*
-Centers the Previous Week and Next Week buttons
-and gives the navigation area a little spacing.
+Centers the Previous Week and Next Week navigation
+and provides spacing between the links.
 */
-nav {
-    text-align: center;
-    padding: 2px;
+.week-navigation {
+    display: flex;
+    justify-content: center;
+
+    gap: 1rem;
+
+    margin-top: 1rem;
 }
 
 
@@ -134,23 +142,12 @@ the site's muted gold accent color.
 
 
 /* =========================================================
-   INSIGHTS SECTION
-   ========================================================= */
-
-#insights {
-    border-color: #B79A5B;
-    background-color: #FFFFFF;
-}
-
-
-
-/* =========================================================
    FORM LABELS
    ========================================================= */
 
 /*
 display: block makes each label take its own line,
-placing it above its corresponding input field.
+placing it above its corresponding form field.
 */
 label {
     display: block;
@@ -168,14 +165,15 @@ label {
    ========================================================= */
 
 /*
-Applies consistent styling to both normal text inputs
-and textarea fields throughout the site.
+Applies consistent styling to text inputs,
+textarea fields, and the study-week dropdown.
 
 box-sizing: border-box keeps the total width at 100%
 even after padding and borders are added.
 */
 input,
-textarea {
+textarea,
+select {
     font-size: 16px;
 
     border: 2px solid black;
@@ -191,17 +189,17 @@ textarea {
 
 /*
 Changes the border color when the user clicks
-or tabs into an input field.
+or tabs into a form field.
 */
 input:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
     border-color: #B79A5B;
 }
 
 
 /*
-Provides more vertical space for longer insight
-and reply messages.
+Provides more vertical space for longer insights.
 */
 textarea {
     height: 100px;
@@ -210,16 +208,18 @@ textarea {
 
 
 /* =========================================================
-   BUTTONS
+   BUTTONS AND BUTTON LINKS
    ========================================================= */
 
 /*
-Applies the same basic style to all buttons.
+Normal buttons and links with the primary-button class
+share the same appearance throughout VerseSync.
 
-The transition makes the hover color change
-appear smoothly instead of instantly.
+This allows navigation links to visually match
+the Submit Insight button.
 */
-button {
+button,
+.primary-button {
     background-color: #B79A5B;
     color: white;
 
@@ -229,13 +229,59 @@ button {
 
     transition: background-color 0.4s ease;
 
-    /* Shows a hand cursor so users know the element is clickable */
     cursor: pointer;
 }
 
 
-/* Changes button color when the mouse hovers over it */
-button:hover {
+/* =========================================================
+   BUTTONS AND BUTTON LINKS
+   ========================================================= */
+
+/*
+Makes real buttons and button-style links
+look identical throughout VerseSync.
+*/
+button,
+.primary-button {
+    background-color: #B79A5B;
+    color: white;
+
+    padding: 8px 10px;
+
+    border: 2px solid #7A6A4C;
+    border-radius: 8px;
+
+    font-family: "Google Sans", sans-serif;
+    font-size: 16px;
+    line-height: normal;
+
+    text-decoration: none;
+    text-align: center;
+
+    cursor: pointer;
+
+    transition: background-color 0.4s ease;
+}
+
+
+/*
+Allows anchor links to behave visually
+like regular buttons.
+*/
+.primary-button {
+    display: inline-block;
+}
+
+
+/* Keeps visited links white */
+.primary-button:visited {
+    color: white;
+}
+
+
+/* Same hover behavior for both */
+button:hover,
+.primary-button:hover {
     background-color: brown;
 }
 
@@ -246,10 +292,8 @@ button:hover {
    ========================================================= */
 
 /*
-Styles each insight generated dynamically by JavaScript.
-
-These cards do not exist permanently in index.html.
-script.js creates them and adds the "insight-card" class.
+Styles each insight rendered from Firestore data
+on the Shared Insights page.
 */
 .insight-card {
     border: 2px solid #D8CBB8;
@@ -268,98 +312,91 @@ script.js creates them and adds the "insight-card" class.
 
 
 /* =========================================================
-   INSIGHT AUTHOR
-   ========================================================= */
-
-/* Makes the person who shared the insight easy to identify */
-.author-name {
-    font-weight: bold;
-}
-
-
-
-/* =========================================================
-   SCRIPTURE REFERENCE
+   COME, FOLLOW ME LINK
    ========================================================= */
 
 /*
-Makes scripture references stand out from the
-main insight text using bold text and muted gold.
-*/
-.scripture-reference {
-    font-weight: bold;
-    color: #96783D;
-}
-
-
-
-/* =========================================================
-   INSIGHT MESSAGE
-   ========================================================= */
-
-/*
-Makes the actual insight slightly larger and italicized
-so it feels separate from the author's name and reference.
-*/
-.insight-text {
-    font-style: italic;
-
-    font-size: 20px;
-
-    line-height: 1.2;
-}
-
-
-
-/* =========================================================
-   REPLIES
-   ========================================================= */
-
-/*
-Indents replies so they visually appear underneath
-and connected to the main insight.
-*/
-.replies-list {
-    margin-left: 20px;
-    margin-top: 10px;
-
-    color: #5B4A3A;
-}
-
-
-/*
-Makes the reply author's name stand out
-from the message underneath it.
-*/
-.reply-author {
-    font-weight: bold;
-    font-size: 14px;
-}
-
-
-/*
-Styles reply messages slightly differently from
-the main insight so the hierarchy stays clear.
-*/
-.reply-text {
-    font-size: 16px;
-    font-style: italic;
-}
-
-
-
-/* =========================================================
-   SCRIPTURE / COME, FOLLOW ME LINK
-   ========================================================= */
-
-/*
-Styles the link that opens the current week's
-Come, Follow Me reading.
-
-The # symbol is used because scripture-link
-is an ID in the HTML.
+The link receives its main appearance from
+the primary-button class.
 */
 #scripture-link {
+    text-align: center;
+}
+
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+footer {
+    font-family: "Google Sans", sans-serif;
+
+    text-align: center;
+
+    padding: 2rem 1rem;
+}
+
+
+footer nav {
+    margin: 0.75rem 0;
+}
+
+
+footer nav a {
+    margin: 0 0.75rem;
+
     color: #5B4A3A;
-    text-align: left;
+
+    text-decoration: none;
+}
+
+
+footer nav a:hover {
+    text-decoration: underline;
+}
+
+/* =========================================================
+   INSIGHT ACTIONS
+   ========================================================= */
+
+/*
+Places the Edit and Delete controls together
+underneath each insight.
+*/
+.insight-actions {
+    margin-top: 15px;
+}
+
+
+/*
+Removes the browser's default arrow/bullet
+from the expandable Edit Insight control.
+*/
+.edit-details summary {
+    list-style: none;
+}
+
+
+/* Removes the default marker in some browsers */
+.edit-details summary::-webkit-details-marker {
+    display: none;
+}
+
+
+/*
+Adds spacing between the Edit button
+and the expanded editing form.
+*/
+.edit-form {
+    margin-top: 15px;
+}
+
+
+/*
+Adds space between the edit section
+and the Delete Insight button.
+*/
+.insight-actions form {
+    margin-top: 10px;
 }
